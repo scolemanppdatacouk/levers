@@ -161,7 +161,7 @@
       <div class="bg-white rounded-xl px-10 py-7 shadow" :class="{ 'ring-2 ring-orange-400': productivity > 380 }">
         <div class="flex items-start justify-between mb-5">
           <div>
-            <div class="text-xs uppercase tracking-[0.2em] text-[#005159] font-bold mb-1">Productivity</div>
+            <a href="https://tableau.ppdata.co.uk/#/site/Intralogistex2026/views/2026IntraLogistexShowcase/WarehouseSelect" target="_blank" class="text-xs uppercase tracking-[0.2em] text-[#005159] font-bold mb-1 hover:text-[#00A1A3] hover:underline cursor-pointer transition-colors">Productivity ↗</a>
             <div class="text-sm text-[#99A9B5]">tasks completed per operative per hour</div>
           </div>
           <div class="text-right">
