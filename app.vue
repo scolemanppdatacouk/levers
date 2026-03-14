@@ -18,7 +18,7 @@
 
       <div class="text-center">
         <h1 class="text-3xl font-bold text-white tracking-tight">Workforce Planning Model</h1>
-        <p class="text-[#BFCD00] text-sm italic mt-1">"Doing more, with less" — for better decisions, every time</p>
+        <p class="text-[#BFCD00] text-sm italic mt-1">"Doing more, with less" becomes a reality when you're making better decisions</p>
       </div>
 
       <div class="text-right">
