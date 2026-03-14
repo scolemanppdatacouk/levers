@@ -127,7 +127,7 @@
       <div class="bg-white rounded-xl px-10 py-7 shadow" :class="{ 'ring-2 ring-orange-400': utilisation > 90 }">
         <div class="flex items-start justify-between mb-5">
           <div>
-            <div class="text-xs uppercase tracking-[0.2em] text-[#005159] font-bold mb-1">Utilisation</div>
+            <a href="https://tableau.ppdata.co.uk/#/site/Intralogistex2026/views/2026IntraLogistexShowcase/Utilisation" target="_blank" class="text-xs uppercase tracking-[0.2em] text-[#005159] font-bold mb-1 hover:text-[#00A1A3] hover:underline cursor-pointer transition-colors">Utilisation ↗</a>
             <div class="text-sm text-[#99A9B5]">% of available hours actively worked</div>
           </div>
           <div class="text-right">
