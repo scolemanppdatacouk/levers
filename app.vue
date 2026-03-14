@@ -194,7 +194,7 @@
       <div class="bg-white rounded-xl px-10 py-7 shadow">
         <div class="flex items-start justify-between mb-5">
           <div>
-            <div class="text-xs uppercase tracking-[0.2em] text-[#005159] font-bold mb-1">SLA Target</div>
+            <a href="https://tableau.ppdata.co.uk/#/site/Intralogistex2026/views/2026IntraLogistexShowcase/SLAPerformance" target="_blank" class="text-xs uppercase tracking-[0.2em] text-[#005159] font-bold mb-1 hover:text-[#00A1A3] hover:underline cursor-pointer transition-colors">SLA Target ↗</a>
             <div class="text-sm text-[#99A9B5]">
               set a target % of weekly demand — adjusts number of operatives to achieve it
               <span v-if="qualityFactor < 1" class="text-orange-500 font-semibold ml-2">
