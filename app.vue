@@ -16,26 +16,45 @@
         </div>
       </div>
 
-      <div class="text-center">
+      <div class="text-center mr-8">
         <h1 class="text-3xl font-bold text-white tracking-tight">Workforce Planning Model</h1>
         <p class="text-[#BFCD00] text-sm italic mt-1">"Doing more, with less" becomes a reality when you're making better decisions</p>
       </div>
 
-      <div class="text-right">
-        <div class="text-[#99A9B5] text-xs uppercase tracking-widest mb-1">Weekly Task Demand</div>
-        <div class="flex items-center justify-end gap-3 my-1">
-          <button @click="demand = Math.max(1_000, demand - 1_000)"
-            class="w-8 h-8 rounded-full bg-[#BFCD00] text-[#005159] text-xl font-bold flex items-center justify-center hover:bg-white transition-colors select-none">−</button>
-          <input
-            type="number"
-            :value="demand / 1000"
-            @change="demand = Math.max(1, Math.round(Number(($event.target as HTMLInputElement).value))) * 1_000"
-            class="w-20 text-center text-3xl font-bold text-[#BFCD00] bg-transparent border-b-2 border-[#BFCD00] focus:outline-none focus:border-white [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
-          /><span class="text-[#BFCD00] text-3xl font-bold">K</span>
-          <button @click="demand = demand + 1_000"
-            class="w-8 h-8 rounded-full bg-[#BFCD00] text-[#005159] text-xl font-bold flex items-center justify-center hover:bg-white transition-colors select-none">+</button>
+      <div class="flex items-start gap-8">
+        <!-- Weekly Task Demand -->
+        <div class="text-right">
+          <div class="text-[#99A9B5] text-xs uppercase tracking-widest mb-1">Weekly Task Demand</div>
+          <div class="flex items-center justify-end gap-3 my-1">
+            <button @click="demand = Math.max(1_000, demand - 1_000)"
+              class="w-8 h-8 rounded-full bg-[#BFCD00] text-[#005159] text-xl font-bold flex items-center justify-center hover:bg-white transition-colors select-none">−</button>
+            <input
+              type="number"
+              :value="demand / 1000"
+              @change="demand = Math.max(1, Math.round(Number(($event.target as HTMLInputElement).value))) * 1_000"
+              class="w-20 text-center text-3xl font-bold text-[#BFCD00] bg-transparent border-b-2 border-[#BFCD00] focus:outline-none focus:border-white [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+            /><span class="text-[#BFCD00] text-3xl font-bold">K</span>
+            <button @click="demand = demand + 1_000"
+              class="w-8 h-8 rounded-full bg-[#BFCD00] text-[#005159] text-xl font-bold flex items-center justify-center hover:bg-white transition-colors select-none">+</button>
+          </div>
+          <div class="text-[#99A9B5] text-xs">tasks / week</div>
         </div>
-        <div class="text-[#99A9B5] text-xs">tasks / week</div>
+
+        <!-- Optimum Util % -->
+        <div class="text-right">
+          <div class="text-[#99A9B5] text-xs uppercase tracking-widest mb-1">Optimum Util %</div>
+          <input type="number" v-model.number="optimumUtil" min="1" max="100"
+            class="w-16 text-center text-3xl font-bold text-[#BFCD00] bg-transparent border-b-2 border-[#BFCD00] focus:outline-none focus:border-white [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+          <div class="text-[#99A9B5] text-xs mt-1">% threshold</div>
+        </div>
+
+        <!-- Optimum Tasks/hr -->
+        <div class="text-right">
+          <div class="text-[#99A9B5] text-xs uppercase tracking-widest mb-1">Optimum Tasks/hr</div>
+          <input type="number" v-model.number="optimumProductivity" min="10" max="499"
+            class="w-16 text-center text-3xl font-bold text-[#BFCD00] bg-transparent border-b-2 border-[#BFCD00] focus:outline-none focus:border-white [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />
+          <div class="text-[#99A9B5] text-xs mt-1">tasks/hr threshold</div>
+        </div>
       </div>
     </header>
 
@@ -145,7 +164,7 @@
           class="ppd-slider"
           min="0" max="100" step="1"
           :value="utilisation"
-          :style="{ background: sliderGradient(utilisation, 0, 100, optimumUtil) }"
+          ref="utilisationSliderEl"
           @input="utilisation = Number(($event.target as HTMLInputElement).value)"
         />
         <div class="relative h-5 mt-2 text-xs">
@@ -153,10 +172,7 @@
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:25%">25%</span>
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:50%">50%</span>
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:75%">75%</span>
-          <span class="absolute -translate-x-1/2 text-orange-400 font-semibold flex items-center gap-1" :style="{ left: optimumUtil + '%' }">
-            <input type="number" v-model.number="optimumUtil" min="1" max="100"
-              class="w-8 text-center text-orange-400 font-semibold bg-transparent border-b border-orange-400 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />%⚠
-          </span>
+          <span class="absolute -translate-x-1/2 text-orange-400 font-semibold" :style="{ left: optimumUtil + '%' }">{{ optimumUtil }}%⚠</span>
           <span class="absolute right-0 text-[#99A9B5]">100%</span>
         </div>
         <div v-if="utilisation > optimumUtil" class="mt-3 flex items-center gap-2 text-orange-500 text-sm font-semibold">
@@ -182,18 +198,15 @@
           class="ppd-slider"
           min="10" max="500" step="5"
           :value="productivity"
-          :style="{ background: sliderGradient(productivity, 10, 500, optimumProductivity) }"
+          ref="productivitySliderEl"
           @input="onProductivityChange(Number(($event.target as HTMLInputElement).value))"
         />
         <div class="relative h-5 mt-2 text-xs">
           <span class="absolute left-0 text-[#99A9B5]">10</span>
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:25%">133</span>
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:50%">255</span>
-          <span class="absolute -translate-x-1/2 text-orange-400 font-semibold flex items-center gap-0.5"
-            :style="{ left: ((optimumProductivity - 10) / (500 - 10) * 100).toFixed(1) + '%' }">
-            <input type="number" v-model.number="optimumProductivity" min="10" max="499"
-              class="w-10 text-center text-orange-400 font-semibold bg-transparent border-b border-orange-400 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />⚠
-          </span>
+          <span class="absolute -translate-x-1/2 text-orange-400 font-semibold"
+            :style="{ left: productivityThresholdPct }">{{ optimumProductivity }}⚠</span>
           <span class="absolute right-0 text-[#99A9B5]">500</span>
         </div>
         <div v-if="productivity > optimumProductivity" class="mt-3 flex items-center gap-2 text-orange-500 text-sm font-semibold">
@@ -227,7 +240,7 @@
           class="ppd-slider"
           min="0" max="100" step="0.5"
           :value="sla"
-          :style="{ background: sliderGradient(sla, 0, 100) }"
+          ref="slaSliderEl"
           @input="onSlaChange(Number(($event.target as HTMLInputElement).value))"
         />
         <div class="flex justify-between text-xs text-[#99A9B5] mt-2 px-1">
@@ -261,6 +274,12 @@ const logoError         = ref(false)
 
 // Optimum headcount reacts to demand, optimumUtil and optimumProductivity
 const OPTIMUM_OPS = computed(() => Math.ceil((demand.value / (HOURS_PER_WEEK * (optimumUtil.value / 100) * optimumProductivity.value)) * 2) / 2)
+
+// ── Slider gradients — computed so Vue re-renders when optimum thresholds change ──
+const utilisationGradient  = computed(() => sliderGradient(utilisation.value, 0, 100, optimumUtil.value))
+const productivityGradient = computed(() => sliderGradient(productivity.value, 10, 500, optimumProductivity.value))
+// Position of the productivity threshold marker as a % of the track
+const productivityThresholdPct = computed(() => ((optimumProductivity.value - 10) / (500 - 10) * 100).toFixed(1) + '%')
 
 // ── Derived metrics ────────────────────────────────────────────────────────
 const hoursAvailable  = computed(() => operatives.value * HOURS_PER_WEEK)
@@ -323,6 +342,26 @@ const badge = computed(() => {
     pillClass: 'bg-red-500 text-white',
   }
 })
+
+// ── Slider DOM refs — background set imperatively so it always repaints ────
+const utilisationSliderEl  = ref<HTMLInputElement | null>(null)
+const productivitySliderEl = ref<HTMLInputElement | null>(null)
+const slaSliderEl          = ref<HTMLInputElement | null>(null)
+
+watchEffect(() => {
+  if (utilisationSliderEl.value)
+    utilisationSliderEl.value.style.background = utilisationGradient.value
+}, { flush: 'post' })
+
+watchEffect(() => {
+  if (productivitySliderEl.value)
+    productivitySliderEl.value.style.background = productivityGradient.value
+}, { flush: 'post' })
+
+watchEffect(() => {
+  if (slaSliderEl.value)
+    slaSliderEl.value.style.background = sliderGradient(sla.value, 0, 100)
+}, { flush: 'post' })
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function sliderGradient(value: number, min: number, max: number, warnAt?: number): string {
