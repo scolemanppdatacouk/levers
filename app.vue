@@ -26,7 +26,12 @@
         <div class="flex items-center justify-end gap-3 my-1">
           <button @click="demand = Math.max(1_000, demand - 1_000)"
             class="w-8 h-8 rounded-full bg-[#BFCD00] text-[#005159] text-xl font-bold flex items-center justify-center hover:bg-white transition-colors select-none">−</button>
-          <span class="text-[#BFCD00] text-3xl font-bold">{{ (demand / 1000).toFixed(0) }}K</span>
+          <input
+            type="number"
+            :value="demand / 1000"
+            @change="demand = Math.max(1, Math.round(Number(($event.target as HTMLInputElement).value))) * 1_000"
+            class="w-20 text-center text-3xl font-bold text-[#BFCD00] bg-transparent border-b-2 border-[#BFCD00] focus:outline-none focus:border-white [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+          /><span class="text-[#BFCD00] text-3xl font-bold">K</span>
           <button @click="demand = demand + 1_000"
             class="w-8 h-8 rounded-full bg-[#BFCD00] text-[#005159] text-xl font-bold flex items-center justify-center hover:bg-white transition-colors select-none">+</button>
         </div>
