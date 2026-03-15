@@ -147,6 +147,11 @@
 
       </div>
 
+      <!-- ── Banner ── -->
+      <div class="bg-[#005159] rounded-xl px-10 py-4 shadow text-center">
+        <p class="text-white text-lg italic">You can ensure people are kept busy, or that they work more efficiently, or add in more people. Which would you prefer?</p>
+      </div>
+
       <!-- ── Utilisation Slider ── -->
       <div class="bg-white rounded-xl px-10 py-7 shadow" :class="{ 'ring-2 ring-orange-400': utilisation > optimumUtil }">
         <div class="flex items-start justify-between mb-5">
