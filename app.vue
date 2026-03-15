@@ -105,7 +105,7 @@
             {{ formatNumber(tasksCompleted) }}<span v-if="surplusCapacity" class="relative group text-orange-500 ml-1 cursor-default">+
               <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-[#005159] text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg z-10">
                 Optimum capacity: {{ formatNumber(optimumTasks) }} tasks<br>
-                <span class="text-[#99A9B5]">{{ operatives }} ops × 40hrs × 90% × 380/hr</span>
+                <span class="text-[#99A9B5]">{{ operatives }} ops × 40hrs × {{ optimumUtil }}% × {{ optimumProductivity }}/hr</span>
               </span>
             </span>
           </div>
@@ -129,14 +129,14 @@
       </div>
 
       <!-- ── Utilisation Slider ── -->
-      <div class="bg-white rounded-xl px-10 py-7 shadow" :class="{ 'ring-2 ring-orange-400': utilisation > 90 }">
+      <div class="bg-white rounded-xl px-10 py-7 shadow" :class="{ 'ring-2 ring-orange-400': utilisation > optimumUtil }">
         <div class="flex items-start justify-between mb-5">
           <div>
             <a href="https://tableau.ppdata.co.uk/#/site/Intralogistex2026/views/2026IntraLogistexShowcase/Utilisation" target="_blank" class="text-xs uppercase tracking-[0.2em] text-[#005159] font-bold mb-1 hover:text-[#00A1A3] hover:underline cursor-pointer transition-colors">Utilisation ↗</a>
             <div class="text-sm text-[#99A9B5]">% of available hours actively worked</div>
           </div>
           <div class="text-right">
-            <span class="text-6xl font-bold" :class="utilisation > 90 ? 'text-orange-500' : 'text-[#005159]'">{{ utilisation }}</span>
+            <span class="text-6xl font-bold" :class="utilisation > optimumUtil ? 'text-orange-500' : 'text-[#005159]'">{{ utilisation }}</span>
             <span class="text-2xl text-[#99A9B5] ml-1">%</span>
           </div>
         </div>
@@ -145,7 +145,7 @@
           class="ppd-slider"
           min="0" max="100" step="1"
           :value="utilisation"
-          :style="{ background: sliderGradient(utilisation, 0, 100, 90) }"
+          :style="{ background: sliderGradient(utilisation, 0, 100, optimumUtil) }"
           @input="utilisation = Number(($event.target as HTMLInputElement).value)"
         />
         <div class="relative h-5 mt-2 text-xs">
@@ -153,24 +153,27 @@
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:25%">25%</span>
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:50%">50%</span>
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:75%">75%</span>
-          <span class="absolute -translate-x-1/2 text-orange-400 font-semibold" style="left:90%">90%⚠</span>
+          <span class="absolute -translate-x-1/2 text-orange-400 font-semibold flex items-center gap-1" :style="{ left: optimumUtil + '%' }">
+            <input type="number" v-model.number="optimumUtil" min="1" max="100"
+              class="w-8 text-center text-orange-400 font-semibold bg-transparent border-b border-orange-400 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />%⚠
+          </span>
           <span class="absolute right-0 text-[#99A9B5]">100%</span>
         </div>
-        <div v-if="utilisation > 90" class="mt-3 flex items-center gap-2 text-orange-500 text-sm font-semibold">
+        <div v-if="utilisation > optimumUtil" class="mt-3 flex items-center gap-2 text-orange-500 text-sm font-semibold">
           <span>⚠ Overworked — quality degrading</span>
           <span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-xs font-bold">−{{ utilisationPenalty }}% quality</span>
         </div>
       </div>
 
       <!-- ── Productivity Slider ── -->
-      <div class="bg-white rounded-xl px-10 py-7 shadow" :class="{ 'ring-2 ring-orange-400': productivity > 380 }">
+      <div class="bg-white rounded-xl px-10 py-7 shadow" :class="{ 'ring-2 ring-orange-400': productivity > optimumProductivity }">
         <div class="flex items-start justify-between mb-5">
           <div>
             <a href="https://tableau.ppdata.co.uk/#/site/Intralogistex2026/views/2026IntraLogistexShowcase/WarehouseSelect" target="_blank" class="text-xs uppercase tracking-[0.2em] text-[#005159] font-bold mb-1 hover:text-[#00A1A3] hover:underline cursor-pointer transition-colors">Productivity ↗</a>
             <div class="text-sm text-[#99A9B5]">tasks completed per operative per hour</div>
           </div>
           <div class="text-right">
-            <span class="text-6xl font-bold" :class="productivity > 380 ? 'text-orange-500' : 'text-[#005159]'">{{ productivity }}</span>
+            <span class="text-6xl font-bold" :class="productivity > optimumProductivity ? 'text-orange-500' : 'text-[#005159]'">{{ productivity }}</span>
             <span class="text-2xl text-[#99A9B5] ml-1">tasks / hr</span>
           </div>
         </div>
@@ -179,17 +182,21 @@
           class="ppd-slider"
           min="10" max="500" step="5"
           :value="productivity"
-          :style="{ background: sliderGradient(productivity, 10, 500, 380) }"
+          :style="{ background: sliderGradient(productivity, 10, 500, optimumProductivity) }"
           @input="onProductivityChange(Number(($event.target as HTMLInputElement).value))"
         />
         <div class="relative h-5 mt-2 text-xs">
           <span class="absolute left-0 text-[#99A9B5]">10</span>
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:25%">133</span>
           <span class="absolute -translate-x-1/2 text-[#99A9B5]" style="left:50%">255</span>
-          <span class="absolute -translate-x-1/2 text-orange-400 font-semibold" style="left:75.5%">380⚠</span>
+          <span class="absolute -translate-x-1/2 text-orange-400 font-semibold flex items-center gap-0.5"
+            :style="{ left: ((optimumProductivity - 10) / (500 - 10) * 100).toFixed(1) + '%' }">
+            <input type="number" v-model.number="optimumProductivity" min="10" max="499"
+              class="w-10 text-center text-orange-400 font-semibold bg-transparent border-b border-orange-400 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none" />⚠
+          </span>
           <span class="absolute right-0 text-[#99A9B5]">500</span>
         </div>
-        <div v-if="productivity > 380" class="mt-3 flex items-center gap-2 text-orange-500 text-sm font-semibold">
+        <div v-if="productivity > optimumProductivity" class="mt-3 flex items-center gap-2 text-orange-500 text-sm font-semibold">
           <span>⚠ Rushing — error rate rising</span>
           <span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-xs font-bold">−{{ productivityPenalty }}% quality</span>
         </div>
@@ -244,23 +251,25 @@
 const HOURS_PER_WEEK = 40
 
 // ── State ──────────────────────────────────────────────────────────────────
-const demand       = ref(352_000)  // weekly task demand, editable in steps of 1,000
-const operatives   = ref(50)
-const utilisation  = ref(55)       // % of hours actually worked
-const productivity = ref(255)      // tasks per operative per hour
-const logoError    = ref(false)
+const demand            = ref(352_000)  // weekly task demand, editable in steps of 1,000
+const operatives        = ref(50)
+const utilisation       = ref(55)       // % of hours actually worked
+const productivity      = ref(255)      // tasks per operative per hour
+const optimumUtil       = ref(90)       // optimum utilisation % threshold
+const optimumProductivity = ref(380)    // optimum tasks/hr threshold
+const logoError         = ref(false)
 
-// Optimum headcount reacts to demand changes
-const OPTIMUM_OPS = computed(() => Math.ceil((demand.value / (HOURS_PER_WEEK * 0.9 * 380)) * 2) / 2)
+// Optimum headcount reacts to demand, optimumUtil and optimumProductivity
+const OPTIMUM_OPS = computed(() => Math.ceil((demand.value / (HOURS_PER_WEEK * (optimumUtil.value / 100) * optimumProductivity.value)) * 2) / 2)
 
 // ── Derived metrics ────────────────────────────────────────────────────────
 const hoursAvailable  = computed(() => operatives.value * HOURS_PER_WEEK)
 const hoursUtilised   = computed(() => hoursAvailable.value * (utilisation.value / 100))
-const operativesNeeded = computed(() => demand.value / (HOURS_PER_WEEK * 0.9 * productivity.value))
-const hoursWasted      = computed(() => (operatives.value - OPTIMUM_OPS.value) * HOURS_PER_WEEK * 0.9)
+const operativesNeeded = computed(() => demand.value / (HOURS_PER_WEEK * (optimumUtil.value / 100) * productivity.value))
+const hoursWasted      = computed(() => (operatives.value - OPTIMUM_OPS.value) * HOURS_PER_WEEK * (optimumUtil.value / 100))
 const wastedTier       = computed(() => {
   const w = hoursWasted.value
-  const redAt = OPTIMUM_OPS.value * HOURS_PER_WEEK * 0.9 * 0.1
+  const redAt = OPTIMUM_OPS.value * HOURS_PER_WEEK * (optimumUtil.value / 100) * 0.1
   if (w >= redAt) return 'red'
   if (w > 40)     return 'orange'
   return 'base'
@@ -268,18 +277,18 @@ const wastedTier       = computed(() => {
 const rawThroughput    = computed(() => hoursUtilised.value * productivity.value)
 const tasksCompleted   = computed(() => Math.min(rawThroughput.value, demand.value))
 const surplusCapacity  = computed(() => rawThroughput.value > demand.value)
-const optimumTasks     = computed(() => operatives.value * HOURS_PER_WEEK * 0.9 * 380)
+const optimumTasks     = computed(() => operatives.value * HOURS_PER_WEEK * (optimumUtil.value / 100) * optimumProductivity.value)
 
 // ── Quality degradation ────────────────────────────────────────────────────
-// Above 90% utilisation people start making mistakes — up to 30% quality loss at 100%
+// Above optimumUtil% utilisation people start making mistakes — up to 30% quality loss at 100%
 const utilisationDegFactor = computed(() => {
-  if (utilisation.value <= 90) return 1
-  return 1 - ((utilisation.value - 90) / 10) * 0.30
+  if (utilisation.value <= optimumUtil.value) return 1
+  return 1 - ((utilisation.value - optimumUtil.value) / (100 - optimumUtil.value)) * 0.30
 })
-// Above 380 tasks/hr people start rushing — up to 25% quality loss at 500
+// Above optimumProductivity tasks/hr people start rushing — up to 25% quality loss at 500
 const productivityDegFactor = computed(() => {
-  if (productivity.value <= 380) return 1
-  return 1 - ((productivity.value - 380) / 120) * 0.25
+  if (productivity.value <= optimumProductivity.value) return 1
+  return 1 - ((productivity.value - optimumProductivity.value) / (500 - optimumProductivity.value)) * 0.25
 })
 // Quality degrades from overwork (util > 90%) and rushing (productivity > 380)
 const qualityFactor   = computed(() => utilisationDegFactor.value * productivityDegFactor.value)
